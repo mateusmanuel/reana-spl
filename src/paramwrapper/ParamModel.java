@@ -156,7 +156,7 @@ class ParamModel {
 		return module;
 	}
 
-	private String addLabelsInModule (String module){
+	private String addLabelsAndStatesInModule (String module){
 		for (Map.Entry<String, Set<Integer>> entry : labels.entrySet()) {
 			String label = entry.getKey();
 			module += "label \"" + label + "\" = ";
@@ -194,17 +194,17 @@ class ParamModel {
 
 	@Override
 	public String toString() {
-		String params, module;
+		String params, initialModule, moduleWithCommands, moduleWithLabelsCommandsandStates;
 
 		params = createParametersString();
 
-		module = initializeModule(params);
+		initialModule = initializeModule(params);
 
-		module = addCommandsInModule(module);
+		moduleWithCommands = addCommandsInModule(initialModule);
 
-		module = addLabelsInModule(module);
+		moduleWithLabelsCommandsandStates = addLabelsAndStatesInModule(moduleWithCommands);
 
-		return module;
+		return moduleWithLabelsCommandsandStates;
 	}
 }
 
