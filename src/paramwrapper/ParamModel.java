@@ -66,9 +66,8 @@ class ParamModel {
 
 	private Map<String, Set<Integer>> getLabels(FDTMC fdtmc) {
 		Map<String, Set<Integer>> labeledStates = new TreeMap<String, Set<Integer>>();
-		Collection<State> states = fdtmc.getStates();
 		
-		for (State s : states) {
+		for (State s : fdtmc.getStates()) {
 			labeledStates = addState(labeledStates, s);
 		}
 		
