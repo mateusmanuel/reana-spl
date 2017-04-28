@@ -144,20 +144,33 @@ public class ParamWrapper implements ParametricModelChecker {
 		return invokeAndGetResult(commandLine, resultsPath+".out");
 	}
 
-    private String invokeParametricPRISM(ParamModel model,
-                                         String modelPath,
-                                         String propertyPath,
-                                         String resultsPath) throws IOException {
-        String commandLine = paramPath+" "
-                             +modelPath+" "
-                             +propertyPath+" "
-                             +"-exportresults "+resultsPath+" "
-                             +"-param "+String.join(",", model.getParameters());
-        String rawResult = invokeAndGetResult(commandLine, resultsPath);
+	public String initializeCommandLine(ParamModel model, String modelPath, String propertyPath, String resultsPath) {
+		return paramPath+" "
+                +modelPath+" "
+                +propertyPath+" "
+                +"-exportresults "+resultsPath+" "
+                +"-param "+String.join(",", model.getParameters());
+	}
+
+	public String generateExpressionFromRawResult(String rawResult) {
         int openBracket = rawResult.indexOf("{");
         int closeBracket = rawResult.indexOf("}");
-        String expression = rawResult.substring(openBracket+1, closeBracket);
-        return expression.trim().replace('|', '/');
+
+		return rawResult.substring(openBracket + 1, closeBracket);
+	}
+
+	public String parseExpression(String expression) {
+		return expression.trim().replace('|', '/');
+	}
+
+    private String invokeParametricPRISM(ParamModel model, String modelPath, String propertyPath, String resultsPath) throws IOException {
+        String commandLine = initializeCommandLine(model, modelPath, propertyPath, resultsPath);
+
+        String rawResult = invokeAndGetResult(commandLine, resultsPath);
+
+        String expression = generateExpressionFromRawResult(rawResult);
+
+        return parseExpression(expression);
     }
 
 	private String invokeModelChecker(String modelPath,
