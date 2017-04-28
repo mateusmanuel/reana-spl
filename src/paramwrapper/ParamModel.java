@@ -109,39 +109,75 @@ class ParamModel {
 		return tmpParameters;
 	}
 
-	@Override
-	public String toString() {
-		String params = "";
-		for (String parameter : parameters) {
-			params += "param double "+parameter+";\n";
-		}
+	private String initializeModule (String params){
 		String module =
 				"dtmc\n" +
 				"\n" +
 				params +
 				"\n" +
 				"module " + moduleName + "\n" +
-				"	"+stateVariable+ " : ["+stateRangeStart+".."+stateRangeEnd+"] init "+initialState+";" +
+				"	" + stateVariable + " : [" + stateRangeStart + ".." + stateRangeEnd + "] init " + initialState + ";" +
 				"\n";
+		return module;
+	}
+
+	private String addCommandsInModule(String module){
 		for (Command command : commands.values()) {
 			module += "	"+command.makeString(stateVariable) + "\n";
 		}
 		module += "endmodule\n\n";
+
+		return module;
+	}
+
+	private String addLabelsInModule (String module){
 		for (Map.Entry<String, Set<Integer>> entry : labels.entrySet()) {
 			String label = entry.getKey();
-			module += "label \""+label+"\" = ";
+			module += "label \"" + label + "\" = ";
 
 			Set<Integer> states = entry.getValue();
-			int count = 1;
-			for (Integer state : states) {
-				module += stateVariable+"="+state;
-				if (count < states.size()) {
-					module += " | ";
-				}
-				count++;
-			}
-			module += ";\n";
+		    module = addStatesInModule(module, states);
+
+		    module += ";\n";
 		}
+		
+		return module;
+	}
+
+	private String addStatesInModule (String module, Set<Integer> states){
+		int count = 1;
+		for (Integer state : states) {
+			module += stateVariable + "=" + state;
+			if (count < states.size()) {
+				module += " | ";
+			}
+			count++;
+		}
+		return module;
+	}
+
+	private String createParametersString (){
+		String params = "";
+		
+		for (String parameter : parameters) {
+			params += "param double " + parameter + ";\n";
+		}
+		
+		return params;
+	}
+
+	@Override
+	public String toString() {
+		String params, module;
+
+		params = createParametersString();
+
+		module = initializeModule(params);
+
+		module = addCommandsInModule(module);
+
+		module = addLabelsInModule(module);
+
 		return module;
 	}
 }
