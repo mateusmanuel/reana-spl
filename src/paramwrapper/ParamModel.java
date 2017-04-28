@@ -148,38 +148,45 @@ class ParamModel {
 	}
 
 	private String addCommandsInModule(String module){
+		String moduleWithCommands = module;
+		
 		for (Command command : commands.values()) {
-			module += "	"+command.makeString(stateVariable) + "\n";
+			moduleWithCommands += "	"+command.makeString(stateVariable) + "\n";
 		}
-		module += "endmodule\n\n";
+		moduleWithCommands += "endmodule\n\n";
 
-		return module;
+		return moduleWithCommands;
 	}
 
 	private String addLabelsAndStatesInModule (String module){
+		String moduleWithLabelsAndStates = module;
+		
 		for (Map.Entry<String, Set<Integer>> entry : labels.entrySet()) {
 			String label = entry.getKey();
-			module += "label \"" + label + "\" = ";
+			moduleWithLabelsAndStates += "label \"" + label + "\" = ";
 
 			Set<Integer> states = entry.getValue();
-		    module = addStatesInModule(module, states);
+			moduleWithLabelsAndStates = addStatesInModule(moduleWithLabelsAndStates, states);
 
-		    module += ";\n";
+			moduleWithLabelsAndStates += ";\n";
 		}
 		
-		return module;
+		return moduleWithLabelsAndStates;
 	}
 
 	private String addStatesInModule (String module, Set<Integer> states){
 		int count = 1;
+		
+		String moduleWithStates = module;
+		
 		for (Integer state : states) {
-			module += stateVariable + "=" + state;
+			moduleWithStates += stateVariable + "=" + state;
 			if (count < states.size()) {
-				module += " | ";
+				moduleWithStates += " | ";
 			}
 			count++;
 		}
-		return module;
+		return moduleWithStates;
 	}
 
 	private String createParametersString (){
