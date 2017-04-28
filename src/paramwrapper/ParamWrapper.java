@@ -172,17 +172,25 @@ public class ParamWrapper implements ParametricModelChecker {
 
 	private String invokeAndGetResult(String commandLine, String resultsPath) throws IOException {
 	    LOGGER.fine(commandLine);
+	    
 		Process program = Runtime.getRuntime().exec(commandLine);
 		int exitCode = 0;
+		
 		try {
 			exitCode = program.waitFor();
 		} catch (InterruptedException e) {
 			LOGGER.severe("Exit code: " + exitCode);
 			LOGGER.log(Level.SEVERE, e.toString(), e);
 		}
+		
 		List<String> lines = Files.readAllLines(Paths.get(resultsPath), Charset.forName("UTF-8"));
 		lines.removeIf(String::isEmpty);
+		
 		// Formula
+		return getLastLine(lines);
+	}
+	
+	private String getLastLine(List<String> lines){
 		return lines.get(lines.size()-1);
 	}
 
