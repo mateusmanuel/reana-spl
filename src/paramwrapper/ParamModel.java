@@ -77,16 +77,17 @@ class ParamModel {
 	
 	private Map<String, Set<Integer>> addState(Map<String, Set<Integer>> labeledStates, State s){
 		String label = s.getLabel();
+		Map<String, Set<Integer>> _labeledStates = labeledStates;
 		
 		if (label != null && !label.isEmpty()) {
-			if (!labeledStates.containsKey(label)) {
-				labeledStates.put(label, new TreeSet<Integer>());
+			if (!_labeledStates.containsKey(label)) {
+				_labeledStates.put(label, new TreeSet<Integer>());
 			}
 			
-			labeledStates.get(label).add(s.getIndex());
+			_labeledStates.get(label).add(s.getIndex());
 		}
 		
-		return labeledStates;
+		return _labeledStates;
 	}
 	
 	private Map<Integer, Command> getCommands(FDTMC fdtmc) {
