@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 
 import fdtmc.FDTMC;
 
+import java.util.Set;
+
 /**
  * Façade to a PARAM executable.
  *
@@ -144,12 +146,15 @@ public class ParamWrapper implements ParametricModelChecker {
 		return invokeAndGetResult(commandLine, resultsPath+".out");
 	}
 
-	public String initializeCommandLine(ParamModel model, String modelPath, String propertyPath, String resultsPath) {
-		return paramPath+" "
-                +modelPath+" "
-                +propertyPath+" "
-                +"-exportresults "+resultsPath+" "
-                +"-param "+String.join(",", model.getParameters());
+	public String initializeCommandLine(String modelPath, String propertyPath, String resultsPath) {
+		return paramPath + " "
+                + modelPath + " "
+                + propertyPath + " "
+                + "-exportresults " + resultsPath;
+	}
+
+	public String addParametersToCommandLine(String commandLine, Set<String> parameters) {
+		return commandLine + " -param " + String.join(",", parameters);
 	}
 
 	public String generateExpressionFromRawResult(String rawResult) {
@@ -164,7 +169,9 @@ public class ParamWrapper implements ParametricModelChecker {
 	}
 
     private String invokeParametricPRISM(ParamModel model, String modelPath, String propertyPath, String resultsPath) throws IOException {
-        String commandLine = initializeCommandLine(model, modelPath, propertyPath, resultsPath);
+        String commandLine = initializeCommandLine(modelPath, propertyPath, resultsPath);
+
+        commandLine = addParametersToCommandLine(commandLine, model.getParameters());
 
         String rawResult = invokeAndGetResult(commandLine, resultsPath);
 
@@ -173,13 +180,10 @@ public class ParamWrapper implements ParametricModelChecker {
         return parseExpression(expression);
     }
 
-	private String invokeModelChecker(String modelPath,
-									  String propertyPath,
-									  String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
-				 			 +modelPath+" "
-				 			 +propertyPath+" "
-				 			 +"-exportresults "+resultsPath;
+	private String invokeModelChecker(String modelPath, String propertyPath, String resultsPath) throws IOException {
+
+		String commandLine = initializeCommandLine(modelPath, propertyPath, resultsPath);
+
 		return invokeAndGetResult(commandLine, resultsPath);
 	}
 
