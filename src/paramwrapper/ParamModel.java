@@ -140,7 +140,7 @@ class ParamModel {
 
 		    module += ";\n";
 		}
-		
+
 		return module;
 	}
 
@@ -158,11 +158,11 @@ class ParamModel {
 
 	private String createParametersString (){
 		String params = "";
-		
+
 		for (String parameter : parameters) {
 			params += "param double " + parameter + ";\n";
 		}
-		
+
 		return params;
 	}
 
@@ -202,17 +202,31 @@ class Command {
 		return updatesProbabilities;
 	}
 
-	public String makeString(String stateVariable) {
-		String command = "[] "+stateVariable+"="+initialState+" -> ";
-		boolean needsPlus = false;
+	public String initializeCommand(String stateVariable) {
+		return "[] " + stateVariable + "=" + initialState + " -> ";
+	}
+
+	public boolean needsPlus(int index) {
+		return index != 0;
+	}
+
+	public String addProbabilitiesAndActionsToCommand(String command, String stateVariable) {
 		for (int i = 0; i < updatesProbabilities.size(); i++) {
-		    if (needsPlus) {
+		    if (needsPlus(i)) {
 		        command += " + ";
-		    } else {
-		        needsPlus = true;
 		    }
-			command += "("+updatesProbabilities.get(i)+") : ("+stateVariable+"'="+updatesActions.get(i)+")";
+
+		    command += "("+updatesProbabilities.get(i)+") : ("+stateVariable+"'="+updatesActions.get(i)+")";
 		}
-		return command+";";
+
+		return command + ";";
+	}
+
+	public String makeString(String stateVariable) {
+		String command = initializeCommand(stateVariable);
+
+		command = addProbabilitiesAndActionsToCommand(command, stateVariable);
+
+		return command;
 	}
 }
