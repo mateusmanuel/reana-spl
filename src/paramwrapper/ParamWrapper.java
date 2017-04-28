@@ -87,18 +87,20 @@ public class ParamWrapper implements ParametricModelChecker {
 		
 		final boolean containConst = modelString.contains("const");
 		
-		if (usePrism && !containConst) {
-		    formula = invokeModelChecker(modelFile.getAbsolutePath(),
+		if (usePrism){
+			if(!containConst){
+				formula = invokeModelChecker(modelFile.getAbsolutePath(),
 		                                 propertyFile.getAbsolutePath(),
 		                                 resultsFile.getAbsolutePath());
-		} else if(usePrism){
-		    formula = invokeParametricPRISM(model,
-		                                    modelFile.getAbsolutePath(),
-                                            propertyFile.getAbsolutePath(),
-                                            resultsFile.getAbsolutePath());
-		} else {
+			}else{
+			    formula = invokeParametricPRISM(model,
+                        				 modelFile.getAbsolutePath(),
+                        				 propertyFile.getAbsolutePath(),
+                        				 resultsFile.getAbsolutePath());
+			}
+		}else {
 		    formula = invokeParametricModelChecker(modelFile.getAbsolutePath(),
-		                                           propertyFile.getAbsolutePath(),
+		                                  		   propertyFile.getAbsolutePath(),
 		                                           resultsFile.getAbsolutePath());
 		}
 		
