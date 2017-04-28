@@ -21,8 +21,10 @@ import fdtmc.Transition;
 
 class ParamModel {
 	private String stateVariable = "s";
+
 	// TODO Deixar nome do módulo PARAM configurável.
 	private String moduleName = "dummyModule";
+	
 	// TODO Inferir estado inicial a partir da topologia da FDTMC.
 	private int initialState = 0;
 
@@ -37,16 +39,19 @@ class ParamModel {
 		if (fdtmc.getVariableName() != null) {
 			stateVariable = fdtmc.getVariableName();
 		}
+		
 		initialState = fdtmc.getInitialState().getIndex();
 		commands = getCommands(fdtmc);
 		labels = getLabels(fdtmc);
+		
 		stateRangeStart = Collections.min(commands.keySet());
 		// PARAM não deixa declarar um intervalo com apenas um número.
+		
 		stateRangeEnd = Math.max(stateRangeStart + 1,
 								 Collections.max(commands.keySet()));
+		
 		parameters = getParameters(commands.values());
 	}
-
     public int getParametersNumber() {
         return parameters.size();
     }
@@ -56,42 +61,63 @@ class ParamModel {
     }
 
 	public int getStatesNumber() {
-	    return stateRangeEnd+1;
+	    return stateRangeEnd + 1;
 	}
 
 	private Map<String, Set<Integer>> getLabels(FDTMC fdtmc) {
 		Map<String, Set<Integer>> labeledStates = new TreeMap<String, Set<Integer>>();
 		Collection<State> states = fdtmc.getStates();
+		
 		for (State s : states) {
-			String label = s.getLabel();
-			if (label != null && !label.isEmpty()) {
-				if (!labeledStates.containsKey(label)) {
-					labeledStates.put(label, new TreeSet<Integer>());
-				}
-				labeledStates.get(label).add(s.getIndex());
-			}
+			labeledStates = addState(labeledStates, s);
 		}
+		
 		return labeledStates;
 	}
 
+	
+	private Map<String, Set<Integer>> addState(Map<String, Set<Integer>> labeledStates, State s){
+		String label = s.getLabel();
+		
+		if (label != null && !label.isEmpty()) {
+			if (!labeledStates.containsKey(label)) {
+				labeledStates.put(label, new TreeSet<Integer>());
+			}
+			
+			labeledStates.get(label).add(s.getIndex());
+		}
+		
+		return labeledStates;
+	}
+	
 	private Map<Integer, Command> getCommands(FDTMC fdtmc) {
 		Map<Integer, Command> tmpCommands = new TreeMap<Integer, Command>();
+		
 		for (Entry<State, List<Transition>> entry : fdtmc.getTransitions().entrySet()) {
 		    int initState = entry.getKey().getIndex();
-			Command command = new Command(initState);
-			if (entry.getValue() != null) {
-			    for (Transition transition : entry.getValue()) {
-			        command.addUpdate(transition.getProbability(),
-			                          transition.getTarget().getIndex());
-			    }
-			} else {
-			    // Workaround: manually adding self-loops in case no
-			    // transition was specified for a given state.
-			    command.addUpdate("1", initState);
-			}
+			Command command = createCommand(initState, entry.getValue());
+			
 			tmpCommands.put(initState, command);
 		}
+		
 		return tmpCommands;
+	}
+	
+	private Command createCommand(int initState, List<Transition> transitions){
+		Command command = new Command(initState);
+		
+		if (transitions != null) {
+		    for (Transition transition : transitions) {
+		        command.addUpdate(transition.getProbability(),
+		                          transition.getTarget().getIndex());
+		    }
+		} else {
+		    // Workaround: manually adding self-loops in case no
+		    // transition was specified for a given state.
+		    command.addUpdate("1", initState);
+		}
+		
+		return command;
 	}
 
 	private Set<String> getParameters(Collection<Command> commands) {
@@ -140,7 +166,7 @@ class ParamModel {
 
 		    module += ";\n";
 		}
-
+		
 		return module;
 	}
 
@@ -158,11 +184,11 @@ class ParamModel {
 
 	private String createParametersString (){
 		String params = "";
-
+		
 		for (String parameter : parameters) {
 			params += "param double " + parameter + ";\n";
 		}
-
+		
 		return params;
 	}
 
@@ -216,7 +242,7 @@ class Command {
 		        command += " + ";
 		    }
 
-		    command += "("+updatesProbabilities.get(i)+") : ("+stateVariable+"'="+updatesActions.get(i)+")";
+			command += "(" + updatesProbabilities.get(i) + ") : (" + stateVariable + "'=" + updatesActions.get(i) + ")";
 		}
 
 		return command + ";";
