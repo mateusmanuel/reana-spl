@@ -244,15 +244,17 @@ class Command {
 	}
 
 	public String addProbabilitiesAndActionsToCommand(String command, String stateVariable) {
+		String newCommand = command;
+
 		for (int i = 0; i < updatesProbabilities.size(); i++) {
 		    if (needsPlus(i)) {
-		        command += " + ";
+		        newCommand += " + ";
 		    }
 
-			command += "(" + updatesProbabilities.get(i) + ") : (" + stateVariable + "'=" + updatesActions.get(i) + ")";
+			newCommand += "(" + updatesProbabilities.get(i) + ") : (" + stateVariable + "'=" + updatesActions.get(i) + ")";
 		}
 
-		return command + ";";
+		return newCommand + ";";
 	}
 
 	public String makeString(String stateVariable) {
