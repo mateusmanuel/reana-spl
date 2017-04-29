@@ -160,12 +160,13 @@ public class FDTMC {
 	}
 	
 	public void addInterfaceOnInterfaceMap(String id, Interface newInterface){
+		String idInterface = id;	
 		List<Interface> interfaceOccurrences = null;
-		if (interfaces.containsKey(id)) {
-	        interfaceOccurrences = interfaces.get(id);
+		if (interfaces.containsKey(idInterface)) {
+	        interfaceOccurrences = interfaces.get(idInterface);
 	    } else {
 	        interfaceOccurrences = new LinkedList<Interface>();
-	        interfaces.put(id, interfaceOccurrences);
+	        interfaces.put(idInterface, interfaceOccurrences);
 	    }
 	    interfaceOccurrences.add(newInterface);
 	 }
@@ -231,8 +232,9 @@ public class FDTMC {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-	    if (obj != null && obj instanceof FDTMC) {
-	        FDTMC other = (FDTMC) obj;
+		Object object = obj;	
+	    if (object != null && object instanceof FDTMC) {
+	        FDTMC other = (FDTMC) object;
 	        LinkedList<List<Interface>> thisInterfaces = new LinkedList<List<Interface>>(interfaces.values());
             LinkedList<List<Interface>> otherInterfaces = new LinkedList<List<Interface>>(other.interfaces.values());
             return states.equals(other.states)
