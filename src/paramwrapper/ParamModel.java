@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import fdtmc.FDTMC;
 import fdtmc.State;
 import fdtmc.Transition;
+import paramwrapper.Command;
 
 
 
@@ -34,14 +35,16 @@ class ParamModel {
 
 	private int stateRangeStart;
 	private int stateRangeEnd;
-
+	
 	public ParamModel(FDTMC fdtmc) {
+		Command command = new Command(initialState);
+		
 		if (fdtmc.getVariableName() != null) {
 			stateVariable = fdtmc.getVariableName();
 		}
 		
 		initialState = fdtmc.getInitialState().getIndex();
-		commands = getCommands(fdtmc);
+		commands = command.getCommands(fdtmc);
 		labels = getLabels(fdtmc);
 		
 		stateRangeStart = Collections.min(commands.keySet());
@@ -74,7 +77,6 @@ class ParamModel {
 		return labeledStates;
 	}
 
-	
 	private Map<String, Set<Integer>> addState(Map<String, Set<Integer>> labeledStates, State s){
 		String label = s.getLabel();
 		Map<String, Set<Integer>> _labeledStates = labeledStates;
@@ -90,36 +92,6 @@ class ParamModel {
 		return _labeledStates;
 	}
 	
-	private Map<Integer, Command> getCommands(FDTMC fdtmc) {
-		Map<Integer, Command> tmpCommands = new TreeMap<Integer, Command>();
-		
-		for (Entry<State, List<Transition>> entry : fdtmc.getTransitions().entrySet()) {
-		    int initState = entry.getKey().getIndex();
-			Command command = createCommand(initState, entry.getValue());
-			
-			tmpCommands.put(initState, command);
-		}
-		
-		return tmpCommands;
-	}
-	
-	private Command createCommand(int initState, List<Transition> transitions){
-		Command command = new Command(initState);
-		
-		if (transitions != null) {
-		    for (Transition transition : transitions) {
-		        command.addUpdate(transition.getProbability(),
-		                          transition.getTarget().getIndex());
-		    }
-		} else {
-		    // Workaround: manually adding self-loops in case no
-		    // transition was specified for a given state.
-		    command.addUpdate("1", initState);
-		}
-		
-		return command;
-	}
-
 	private Set<String> getParameters(Collection<Command> commands) {
 		Set<String> tmpParameters = new HashSet<String>();
 
