@@ -39,20 +39,48 @@ public class ParamWrapper implements ParametricModelChecker {
         this.usePrism = paramPath.contains("prism");
         this.modelCollector = modelCollector;
     }
+    
+	public String getParamPath() {
+		return paramPath;
+	}
+
+	public void setParamPath(String paramPath) {
+		this.paramPath = paramPath;
+	}
+
+	public IModelCollector getModelCollector() {
+		return modelCollector;
+	}
+
+	public void setModelCollector(IModelCollector modelCollector) {
+		this.modelCollector = modelCollector;
+	}
+
+	public boolean isUsePrism() {
+		return usePrism;
+	}
+
+	public void setUsePrism(boolean usePrism) {
+		this.usePrism = usePrism;
+	}
+	
+	public static Logger getLogger() {
+		return LOGGER;
+	}
 
 	public String fdtmcToParam(FDTMC fdtmc) {
 		ParamModel model = new ParamModel(fdtmc);
-		modelCollector.collectModel(model.getParametersNumber(), model.getStatesNumber());
+		getModelCollector().collectModel(model.getParametersNumber(), model.getStatesNumber());
 		return model.toString();
 	}
 
 	@Override
 	public String getReliability(FDTMC fdtmc) {
 	    ParamModel model = new ParamModel(fdtmc);
-        modelCollector.collectModel(model.getParametersNumber(), model.getStatesNumber());
+        getModelCollector().collectModel(model.getParametersNumber(), model.getStatesNumber());
 		String modelString = model.toString();
 
-		if (usePrism) {
+		if (isUsePrism()) {
 		    modelString = modelString.replace("param", "const");
 		}
 		String reliabilityProperty = "P=? [ F \"success\" ]";
@@ -89,7 +117,7 @@ public class ParamWrapper implements ParametricModelChecker {
 		
 		final boolean containConst = modelString.contains("const");
 		
-		if (usePrism){
+		if (isUsePrism()){
 			if(!containConst){
 				formula = invokeModelChecker(modelFile.getAbsolutePath(),
 		                                 propertyFile.getAbsolutePath(),
@@ -111,7 +139,7 @@ public class ParamWrapper implements ParametricModelChecker {
 
 	private String evaluate(String modelString, String property, ParamModel model) {
 		try {
-		    LOGGER.finer(modelString);
+		    getLogger().finer(modelString);
 
 		    File modelFile = writeModelFileWithExtensionParam(modelString);
 
@@ -125,12 +153,12 @@ public class ParamWrapper implements ParametricModelChecker {
 		
 			long elapsedTime = System.nanoTime() - startTime;
             
-			modelCollector.collectModelCheckingTime(elapsedTime);
+			getModelCollector().collectModelCheckingTime(elapsedTime);
 			
             return formula.trim().replaceAll("\\s+", "");
             
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.toString(), e);
+			getLogger().log(Level.SEVERE, e.toString(), e);
 		}
 		return "";
 	}
@@ -139,15 +167,15 @@ public class ParamWrapper implements ParametricModelChecker {
 	private String invokeParametricModelChecker(String modelPath,
 												String propertyPath,
 												String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
-							 +modelPath+" "
-							 +propertyPath+" "
-							 +"--result-file "+resultsPath;
-		return invokeAndGetResult(commandLine, resultsPath+".out");
+		String commandLine = getParamPath() + " "
+							 + modelPath + " "
+							 + propertyPath + " "
+							 + "--result-file " + resultsPath;
+		return invokeAndGetResult(commandLine, resultsPath + ".out");
 	}
 
 	public String initializeCommandLine(String modelPath, String propertyPath, String resultsPath) {
-		return paramPath + " "
+		return getParamPath() + " "
                 + modelPath + " "
                 + propertyPath + " "
                 + "-exportresults " + resultsPath;
@@ -188,7 +216,7 @@ public class ParamWrapper implements ParametricModelChecker {
 	}
 
 	private String invokeAndGetResult(String commandLine, String resultsPath) throws IOException {
-	    LOGGER.fine(commandLine);
+	    getLogger().fine(commandLine);
 	    
 		Process program = Runtime.getRuntime().exec(commandLine);
 		int exitCode = 0;
@@ -196,8 +224,8 @@ public class ParamWrapper implements ParametricModelChecker {
 		try {
 			exitCode = program.waitFor();
 		} catch (InterruptedException e) {
-			LOGGER.severe("Exit code: " + exitCode);
-			LOGGER.log(Level.SEVERE, e.toString(), e);
+			getLogger().severe("Exit code: " + exitCode);
+			getLogger().log(Level.SEVERE, e.toString(), e);
 		}
 		
 		List<String> lines = Files.readAllLines(Paths.get(resultsPath), Charset.forName("UTF-8"));
