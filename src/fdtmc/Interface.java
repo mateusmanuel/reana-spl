@@ -14,36 +14,60 @@ public class Interface {
     private Transition errorTransition;
 
     public Interface(String abstractedId, State initial, State success, State error, Transition successTransition, Transition errorTransition) {
-        this.abstractedId = abstractedId;
-        this.initial = initial;
-        this.success = success;
-        this.error = error;
-        this.successTransition = successTransition;
-        this.errorTransition = errorTransition;
+        this.setAbstractedId(abstractedId);
+        this.setInitial(initial);
+        this.setSuccess(success);
+        this.setError(error);
+        this.setSuccessTransition(successTransition);
+        this.setErrorTransition(errorTransition);
     }
 
     public State getInitial() {
         return initial;
     }
 
+    public void setInitial(State initial) {
+    	this.initial = initial;
+    }
+
     public State getSuccess() {
         return success;
+    }
+
+    public void setSuccess(State success) {
+    	this.success = success;
     }
 
     public State getError() {
         return error;
     }
 
+    public void setError(State error) {
+    	this.error = error;
+    }
+
     public Transition getSuccessTransition() {
         return successTransition;
+    }
+
+    public void setSuccessTransition(Transition successTransition) {
+    	this.successTransition = successTransition;
     }
 
     public Transition getErrorTransition() {
         return errorTransition;
     }
 
+    public void setErrorTransition(Transition errorTransition) {
+    	this.errorTransition = errorTransition;
+    }
+
     public String getAbstractedId() {
         return abstractedId;
+    }
+
+    public void setAbstractedId(String abstractedId) {
+    	this.abstractedId = abstractedId;
     }
 
     /**
@@ -53,22 +77,22 @@ public class Interface {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof Interface) {
             Interface other = (Interface) obj;
-            return initial.equals(other.initial)
-                    && success.equals(other.success)
-                    && error.equals(other.error)
-                    && successTransition.equals(other.successTransition)
-                    && errorTransition.equals(other.errorTransition);
+            return this.getInitial().equals(other.getInitial())
+                    && this.getSuccess().equals(other.getSuccess())
+                    && this.getError().equals(other.getError())
+                    && this.getSuccessTransition().equals(other.getSuccessTransition())
+                    && this.getErrorTransition().equals(other.getErrorTransition());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return initial.hashCode()
-                + success.hashCode()
-                + error.hashCode()
-                + successTransition.hashCode()
-                + errorTransition.hashCode();
+        return this.getInitial().hashCode()
+                + this.getSuccess().hashCode()
+                + this.getError().hashCode()
+                + this.getSuccessTransition().hashCode()
+                + this.getErrorTransition().hashCode();
     }
 
 }
