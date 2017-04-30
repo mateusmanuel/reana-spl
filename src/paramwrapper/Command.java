@@ -1,10 +1,14 @@
 package paramwrapper;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.junit.Assert;
+
 import java.util.Map.Entry;
 
 import fdtmc.FDTMC;
@@ -15,6 +19,7 @@ class Command {
 	private int initialState;
 	private List<String> updatesProbabilities;
 	private List<Integer> updatesActions;
+	
 
 	public Command(int initialState) {
 		this.initialState = initialState;
@@ -37,13 +42,39 @@ class Command {
 	public List<Integer> getUpdatesActions() {
 		return updatesActions;
 	}
-
-	public void setUpdatesActions(List<Integer> updatesActions) {
-		this.updatesActions = updatesActions;
+	
+	@SuppressWarnings("rawtypes")
+	public void initializeUpdateActions(List<Integer> actions) {
+		if(!updatesActions.isEmpty()){
+			Iterator iterator = actions.iterator();
+			while (iterator.hasNext()) {
+				addUpdatesActions((Integer)iterator.next());
+			}
+		}
 	}
-
-	public void setUpdatesProbabilities(List<String> updatesProbabilities) {
-		this.updatesProbabilities = updatesProbabilities;
+	
+	public void addUpdatesActions(Integer action) {
+		updatesActions.add(action);
+	}
+	public void removeCourse (Integer action) {
+		updatesActions.remove(action);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public void initializeUpdatesProbabilities(List<String> probabilities) {
+		if(!updatesProbabilities.isEmpty()){
+			Iterator iterator = probabilities.iterator();
+			while (iterator.hasNext()) {
+				addUpdatesProbabilities((String)iterator.next());
+			}
+		}
+	}
+	
+	public void addUpdatesProbabilities(String probability) {
+		updatesProbabilities.add(probability);
+	}
+	public void removeProbabilities (String probability) {
+		updatesProbabilities.remove(probability);
 	}
 	
 	public Map<Integer, Command> getCommands(FDTMC fdtmc) {
