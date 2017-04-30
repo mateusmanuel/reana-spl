@@ -37,34 +37,94 @@ class ParamModel {
 	private int stateRangeEnd;
 	
 	public ParamModel(FDTMC fdtmc) {
-		Command command = new Command(initialState);
+		Command command = new Command(getInitialState());
 		
 		if (fdtmc.getVariableName() != null) {
-			stateVariable = fdtmc.getVariableName();
+			setStateVariable(fdtmc.getVariableName());
 		}
 		
-		initialState = fdtmc.getInitialState().getIndex();
-		commands = command.getCommands(fdtmc);
-		labels = getLabels(fdtmc);
+		setInitialState(fdtmc.getInitialState().getIndex());
+		setCommands(command.getCommands(fdtmc));
+		setLabels(getLabels(fdtmc));
 		
-		stateRangeStart = Collections.min(commands.keySet());
+		setStateRangeStart(Collections.min(getCommands().keySet()));
 		// PARAM não deixa declarar um intervalo com apenas um número.
 		
-		stateRangeEnd = Math.max(stateRangeStart + 1,
-								 Collections.max(commands.keySet()));
+		setStateRangeEnd(Math.max(getStateRangeStart() + 1,
+								 Collections.max(getCommands().keySet())));
 		
-		parameters = getParameters(commands.values());
+		setParameters(getParametersByCommands(getCommands().values()));
 	}
     public int getParametersNumber() {
-        return parameters.size();
-    }
-
-    public Set<String> getParameters() {
-        return parameters;
+        return getParameters().size();
     }
 
 	public int getStatesNumber() {
-	    return stateRangeEnd + 1;
+	    return getStateRangeEnd() + 1;
+	}
+	
+	public String getStateVariable() {
+		return stateVariable;
+	}
+	
+	public void setStateVariable(String stateVariable) {
+		this.stateVariable = stateVariable;
+	}
+
+	public Set<String> getParameters(){
+		return parameters;
+	}
+	
+	public void setParameters(Set<String> parameters){
+		this.parameters = parameters;
+	}
+	
+	public Map<String, Set<Integer>> getLabels(){
+		return labels;
+	}
+	
+	public void setLabels(Map<String, Set<Integer>> labels){
+		this.labels = labels;
+	}
+	
+	public String getModuleName() {
+		return moduleName;
+	}
+
+	public void setModuleName(String moduleName) {
+		this.moduleName = moduleName;
+	}
+	
+	public int getInitialState() {
+		return initialState;
+	}
+	
+	public void setInitialState(int initialState) {
+		this.initialState = initialState;
+	}
+	
+	public int getStateRangeStart() {
+		return stateRangeStart;
+	}
+	
+	public void setStateRangeStart(int stateRangeStart) {
+		this.stateRangeStart = stateRangeStart;
+	}
+	
+	public int getStateRangeEnd() {
+		return stateRangeEnd;
+	}
+	
+	public void setStateRangeEnd(int stateRangeEnd) {
+		this.stateRangeEnd = stateRangeEnd;
+	}
+	
+	public Map<Integer, Command> getCommands() {
+		return commands;
+	}
+
+	public void setCommands(Map<Integer, Command> commands) {
+		this.commands = commands;
 	}
 
 	private Map<String, Set<Integer>> getLabels(FDTMC fdtmc) {
@@ -92,7 +152,7 @@ class ParamModel {
 		return _labeledStates;
 	}
 	
-	private Set<String> getParameters(Collection<Command> commands) {
+	private Set<String> getParametersByCommands(Collection<Command> commands) {
 		Set<String> tmpParameters = new HashSet<String>();
 
 		Pattern validIdentifier = Pattern.compile("(^|\\d+-)([A-Za-z_][A-Za-z0-9_]*)");
@@ -113,8 +173,8 @@ class ParamModel {
 				"\n" +
 				params +
 				"\n" +
-				"module " + moduleName + "\n" +
-				"	" + stateVariable + " : [" + stateRangeStart + ".." + stateRangeEnd + "] init " + initialState + ";" +
+				"module " + getModuleName() + "\n" +
+				"	" + getStateVariable() + " : [" + getStateRangeStart() + ".." + getStateRangeEnd() + "] init " + getInitialState() + ";" +
 				"\n";
 		return module;
 	}
@@ -122,8 +182,8 @@ class ParamModel {
 	private String addCommandsInModule(String module){
 		String moduleWithCommands = module;
 		
-		for (Command command : commands.values()) {
-			moduleWithCommands += "	"+command.makeString(stateVariable) + "\n";
+		for (Command command : getCommands().values()) {
+			moduleWithCommands += "	"+command.makeString(getStateVariable()) + "\n";
 		}
 		moduleWithCommands += "endmodule\n\n";
 
@@ -133,7 +193,7 @@ class ParamModel {
 	private String addLabelsAndStatesInModule (String module){
 		String moduleWithLabelsAndStates = module;
 		
-		for (Map.Entry<String, Set<Integer>> entry : labels.entrySet()) {
+		for (Map.Entry<String, Set<Integer>> entry : getLabels().entrySet()) {
 			String label = entry.getKey();
 			moduleWithLabelsAndStates += "label \"" + label + "\" = ";
 
@@ -152,7 +212,7 @@ class ParamModel {
 		String moduleWithStates = module;
 		
 		for (Integer state : states) {
-			moduleWithStates += stateVariable + "=" + state;
+			moduleWithStates += getStateVariable() + "=" + state;
 			if (count < states.size()) {
 				moduleWithStates += " | ";
 			}
@@ -164,7 +224,7 @@ class ParamModel {
 	private String createParametersString (){
 		String params = "";
 		
-		for (String parameter : parameters) {
+		for (String parameter : getParameters()) {
 			params += "param double " + parameter + ";\n";
 		}
 		
