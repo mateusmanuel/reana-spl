@@ -7,26 +7,42 @@ public class Transition {
 	private State source, target;
 
 	public Transition(State source, State target, String actionName, String probability) {
-		this.source = source;
-		this.target = target;
-		this.actionName = actionName;
-		this.probability = probability;
+		this.setSource(source);
+		this.setTarget(target);
+		this.setActionName(actionName);
+		this.setProbability(probability);
 	}
 
 	public String getActionName() {
 		return actionName;
 	}
 
+	public void setActionName(String actionName) {
+		this.actionName = actionName;
+	}	
+	
 	public String getProbability() {
 		return probability;
 	}
 
+	public void setProbability(String probability) {
+		this.probability = probability;
+	}
+	
 	public State getSource() {
 		return source;
+	}
+	
+	public void setSource(State source) {
+		this.source = source;
 	}
 
 	public State getTarget() {
 		return target;
+	}
+	
+	public void setTarget(State target) {
+		this.target = target;
 	}
 
     /**
@@ -38,16 +54,16 @@ public class Transition {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof Transition) {
             Transition other = (Transition) obj;
-            return source.equals(other.source)
-                    && target.equals(other.target)
-                    && areEqualProbabilities(probability, other.probability);
+            return this.getSource().equals(other.getSource())
+                    && getTarget().equals(other.getTarget())
+                    && areEqualProbabilities(this.getProbability(), other.getProbability());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.source.hashCode() + this.target.hashCode();
+        return this.getSource().hashCode() + this.getTarget().hashCode();
     }
 
     /**
