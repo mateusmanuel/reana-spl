@@ -113,7 +113,7 @@ public class SPLFilePersistence {
 			// for (State s1: f.getTransitions().keySet()) {
 			// System.out.println(s1.getLabel() + s.getIndex());
 			// }
-			for (Transition t : f.getTransitions().get(s)) {
+			for (Transition t : f.getTransitionSystem().get(s)) {
 				State target = t.getTarget();
 				String targetEntry = target.getVariableName()
 						+ target.getIndex();

@@ -503,12 +503,12 @@ public class Transformer {
 		Integer nStates, nTrans = 0;
 
 		nStates = fdtmc.getStates().size();
-		Set<State> states = fdtmc.getTransitions().keySet();
+		Set<State> states = fdtmc.getTransitionSystem().keySet();
 		Iterator <State> itStates = states.iterator();
 		while (itStates.hasNext()) {
 			State temp = itStates.next();
-			if (fdtmc.getTransitions().get(temp) != null)
-				nTrans += fdtmc.getTransitions().get(temp).size();
+			if (fdtmc.getTransitionSystem().get(temp) != null)
+				nTrans += fdtmc.getTransitionSystem().get(temp).size();
 		}
 		LOGGER.finer("Model Size: " + nStates + " states; " + nTrans + " transitions.");
 	}

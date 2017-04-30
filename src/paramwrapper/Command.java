@@ -90,7 +90,7 @@ class Command {
 	public Map<Integer, Command> getCommands(FDTMC fdtmc) {
 		Map<Integer, Command> tmpCommands = new TreeMap<Integer, Command>();
 		
-		for (Entry<State, List<Transition>> entry : fdtmc.getTransitions().entrySet()) {
+		for (Entry<State, List<Transition>> entry : fdtmc.getTransitionSystem().entrySet()) {
 		    int initState = entry.getKey().getIndex();
 			Command command = createCommand(initState, entry.getValue());
 			
