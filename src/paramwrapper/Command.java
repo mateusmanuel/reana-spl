@@ -20,7 +20,17 @@ class Command {
 	private List<String> updatesProbabilities;
 	private List<Integer> updatesActions;
 	
-
+	private final String PROBABILITY_ONE = "1";
+	private final String PLUS = " + ";
+	private final String BRACKET = "[] ";
+	private final String EQUAL = "=";
+	private final String RIGHT_ARROW = " -> ";
+	private final String LEFT_PARENTHESES = "(";
+	private final String RIGHT_PARENTHESES = ")";
+	private final String PARENTHESES_WITH_COLON_IN_THE_MIDDLE = ") : (";
+	private final String SEMI_COLON = ";";
+	private final String APOSTROPHE_AND_EQUAL = "'=";
+	
 	public Command(int initialState) {
 		this.initialState = initialState;
         this.updatesProbabilities = new LinkedList<String>();
@@ -101,7 +111,7 @@ class Command {
 		} else {
 		    // Workaround: manually adding self-loops in case no
 		    // transition was specified for a given state.
-		    command.addUpdate("1", initState);
+		    command.addUpdate(PROBABILITY_ONE, initState);
 		}
 		
 		return command;
@@ -113,7 +123,7 @@ class Command {
 	}
 
 	public String initializeCommand(String stateVariable) {
-		return "[] " + stateVariable + "=" + getInitialState() + " -> ";
+		return BRACKET + stateVariable + EQUAL + getInitialState() + RIGHT_ARROW;
 	}
 
 	public boolean needsPlus(int index) {
@@ -126,13 +136,15 @@ class Command {
 
 		for (int i = 0; i < updatesProbabilities.size(); i++) {
 		    if (needsPlus(i)) {
-		        newCommand += " + ";
+		        newCommand += PLUS;
 		    }
 
-			newCommand += "(" + ((List<String>) updatesProbabilities).get(i) + ") : (" + stateVariable + "'=" + updatesActions.get(i) + ")";
+			newCommand += LEFT_PARENTHESES + ((List<String>) updatesProbabilities).get(i) 
+					+ PARENTHESES_WITH_COLON_IN_THE_MIDDLE + stateVariable + APOSTROPHE_AND_EQUAL
+					+ updatesActions.get(i) + RIGHT_PARENTHESES;
 		}
 
-		return newCommand + ";";
+		return newCommand + SEMI_COLON;
 	}
 
 	public String makeString(String stateVariable) {
