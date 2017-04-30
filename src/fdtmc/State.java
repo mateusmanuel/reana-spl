@@ -19,15 +19,15 @@ public class State {
 	}
 
 	public int getIndex() {
-		return index;
+		return this.index;
 	}
 
 	public String getVariableName() {
-		return variableName;
+		return this.variableName;
 	}
 
 	public String getLabel() {
-		return label;
+		return this.label;
 	}
 
     /**
@@ -38,14 +38,14 @@ public class State {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof State) {
             State other = (State) obj;
-            return this.index == other.index;
+            return this.getIndex() == other.getIndex();
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return index + 1;
+        return this.getIndex() + 1;
     }
 
 }
