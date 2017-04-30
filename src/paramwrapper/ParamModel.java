@@ -3,10 +3,7 @@ package paramwrapper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -15,14 +12,20 @@ import java.util.regex.Pattern;
 
 import fdtmc.FDTMC;
 import fdtmc.State;
-import fdtmc.Transition;
-import paramwrapper.Command;
 
 
 
 class ParamModel {
 	private String stateVariable = "s";
-
+	
+	private final String REGEX_IDENTIFIER = "(^|\\d+-)([A-Za-z_][A-Za-z0-9_]*)";
+	private final String DTMC = "dtmc";
+	private final String MODULE = "module";
+	private final String PARAM_DOUBLE = "param double";
+	private final String ENDMODULE = "endmodule";
+	private final String LABEL = "label";
+	private final String ENDL = "\n";
+	
 	// TODO Deixar nome do módulo PARAM configurável.
 	private String moduleName = "dummyModule";
 	
@@ -55,6 +58,7 @@ class ParamModel {
 		
 		setParameters(getParametersByCommands(getCommands().values()));
 	}
+	
     public int getParametersNumber() {
         return getParameters().size();
     }
@@ -67,7 +71,7 @@ class ParamModel {
 		return stateVariable;
 	}
 	
-	public void setStateVariable(String stateVariable) {
+	private void setStateVariable(String stateVariable) {
 		this.stateVariable = stateVariable;
 	}
 
@@ -75,7 +79,7 @@ class ParamModel {
 		return parameters;
 	}
 	
-	public void setParameters(Set<String> parameters){
+	private void setParameters(Set<String> parameters){
 		this.parameters = parameters;
 	}
 	
@@ -83,23 +87,19 @@ class ParamModel {
 		return labels;
 	}
 	
-	public void setLabels(Map<String, Set<Integer>> labels){
+	private void setLabels(Map<String, Set<Integer>> labels){
 		this.labels = labels;
 	}
 	
 	public String getModuleName() {
 		return moduleName;
 	}
-
-	public void setModuleName(String moduleName) {
-		this.moduleName = moduleName;
-	}
 	
 	public int getInitialState() {
 		return initialState;
 	}
 	
-	public void setInitialState(int initialState) {
+	private void setInitialState(int initialState) {
 		this.initialState = initialState;
 	}
 	
@@ -155,7 +155,7 @@ class ParamModel {
 	private Set<String> getParametersByCommands(Collection<Command> commands) {
 		Set<String> tmpParameters = new HashSet<String>();
 
-		Pattern validIdentifier = Pattern.compile("(^|\\d+-)([A-Za-z_][A-Za-z0-9_]*)");
+		Pattern validIdentifier = Pattern.compile(REGEX_IDENTIFIER);
 		for (Command command : commands) {
 			for (String probability : command.getUpdatesProbabilities()) {
 				Matcher m = validIdentifier.matcher(probability);
@@ -169,13 +169,13 @@ class ParamModel {
 
 	private String initializeModule (String params){
 		String module =
-				"dtmc\n" +
-				"\n" +
+				DTMC + ENDL +
+				ENDL +
 				params +
-				"\n" +
-				"module " + getModuleName() + "\n" +
+				ENDL +
+				MODULE + " " + getModuleName() + ENDL +
 				"	" + getStateVariable() + " : [" + getStateRangeStart() + ".." + getStateRangeEnd() + "] init " + getInitialState() + ";" +
-				"\n";
+				ENDL;
 		return module;
 	}
 
@@ -183,9 +183,9 @@ class ParamModel {
 		String moduleWithCommands = module;
 		
 		for (Command command : getCommands().values()) {
-			moduleWithCommands += "	"+command.makeString(getStateVariable()) + "\n";
+			moduleWithCommands += "	"+command.makeString(getStateVariable()) + ENDL;
 		}
-		moduleWithCommands += "endmodule\n\n";
+		moduleWithCommands += ENDMODULE + ENDL + ENDL;
 
 		return moduleWithCommands;
 	}
@@ -195,12 +195,12 @@ class ParamModel {
 		
 		for (Map.Entry<String, Set<Integer>> entry : getLabels().entrySet()) {
 			String label = entry.getKey();
-			moduleWithLabelsAndStates += "label \"" + label + "\" = ";
+			moduleWithLabelsAndStates += LABEL + " \"" + label + "\" = ";
 
 			Set<Integer> states = entry.getValue();
 			moduleWithLabelsAndStates = addStatesInModule(moduleWithLabelsAndStates, states);
 
-			moduleWithLabelsAndStates += ";\n";
+			moduleWithLabelsAndStates += ";" + ENDL;
 		}
 		
 		return moduleWithLabelsAndStates;
@@ -225,7 +225,7 @@ class ParamModel {
 		String params = "";
 		
 		for (String parameter : getParameters()) {
-			params += "param double " + parameter + ";\n";
+			params += PARAM_DOUBLE + " " + parameter + ";" + ENDL;
 		}
 		
 		return params;
