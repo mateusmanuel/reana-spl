@@ -32,7 +32,7 @@ class ParamModel {
 	// TODO Inferir estado inicial a partir da topologia da FDTMC.
 	private int initialState = 0;
 
-	private Set<String> parameters;
+	private Set<String> parameters =  new HashSet<String>();
 	private Map<String, Set<Integer>> labels;
 	private Map<Integer, Command> commands;
 
@@ -56,7 +56,7 @@ class ParamModel {
 		setStateRangeEnd(Math.max(getStateRangeStart() + 1,
 								 Collections.max(getCommands().keySet())));
 		
-		setParameters(getParametersByCommands(getCommands().values()));
+		getParametersByCommands(getCommands().values());
 	}
 	
     public int getParametersNumber() {
@@ -77,10 +77,6 @@ class ParamModel {
 
 	public Set<String> getParameters(){
 		return parameters;
-	}
-	
-	private void setParameters(Set<String> parameters){
-		this.parameters = parameters;
 	}
 	
 	public Map<String, Set<Integer>> getLabels(){
@@ -152,19 +148,21 @@ class ParamModel {
 		return _labeledStates;
 	}
 	
-	private Set<String> getParametersByCommands(Collection<Command> commands) {
-		Set<String> tmpParameters = new HashSet<String>();
+	private void getParametersByCommands(Collection<Command> commands) {
 
 		Pattern validIdentifier = Pattern.compile(REGEX_IDENTIFIER);
 		for (Command command : commands) {
 			for (String probability : command.getUpdatesProbabilities()) {
 				Matcher m = validIdentifier.matcher(probability);
 				while (m.find()) {
-					tmpParameters.add(m.group(2));
+					addParameter(m.group(2));
 				}
 			}
 		}
-		return tmpParameters;
+	}
+
+	private void addParameter(String group) {
+		getParameters().add(group);
 	}
 
 	private String initializeModule (String params){
