@@ -62,14 +62,13 @@ public class FDTMC {
     public void setInitialState(State initialState) {
     	this.initialState = initialState;
     }
-
+    
     private void setAndAddLabelToInitialState(State initialState) {
-        if (this.initialState != null) {
-            this.initialState.setLabel(null);
+        if (this.initialState != null){
+        	this.initialState.setLabel(null);
         }
 
         this.setInitialState(initialState);
-
         initialState.setLabel(INITIAL_LABEL);
     }
     
@@ -138,7 +137,7 @@ public class FDTMC {
 	public List<Interface> getValueFromInterfaces(String entry) {
 		return this.getInterfaces().get(entry);
 	}
-
+	
 	public State createState() {
 		State temp = new State();
 		temp.setVariableName(this.getVariableName());
@@ -296,6 +295,22 @@ public class FDTMC {
 				EQUAL_SIGN + transition.getTarget().getIndex() + 
 				((transition.getTarget().getLabel() != null) ? OPEN_PARENTHESIS + transition.getTarget().getLabel() + CLOSE_PARENTHESIS : EMPTY_STRING) + NEW_LINE;
 	}
+	
+	private boolean notNullFDTMC(Object object){
+		return object != null && object instanceof FDTMC;
+	}
+	
+	private boolean areEqualFDTMC(FDTMC fdtmc){
+		LinkedList<List<Interface>> thisInterfaces = new LinkedList<List<Interface>>(this.getInterfaces().values());
+        LinkedList<List<Interface>> otherInterfaces = new LinkedList<List<Interface>>(fdtmc.getInterfaces().values());
+        
+		return this.getStates().equals(fdtmc.getStates())
+				&& this.getInitialState().equals(fdtmc.getInitialState())
+				&& this.getSuccessState().equals(fdtmc.getSuccessState())
+				&& this.getErrorState().equals(fdtmc.getErrorState())
+				&& this.getTransitionSystem().equals(fdtmc.getTransitionSystem())
+				&& thisInterfaces.equals(otherInterfaces);
+	}
 
 	/**
 	 * Two FDTMCs are deemed equal whenever:
@@ -305,19 +320,13 @@ public class FDTMC {
 	 *     - the transitions with variable names have equal source and target states; and
 	 *     - the abstracted interfaces are equal.
 	 */
+	
 	@Override
 	public boolean equals(Object obj) {
 		Object object = obj;	
-	    if (object != null && object instanceof FDTMC) {
+	    if (notNullFDTMC(object)) {
 	        FDTMC other = (FDTMC) object;
-	        LinkedList<List<Interface>> thisInterfaces = new LinkedList<List<Interface>>(this.getInterfaces().values());
-            LinkedList<List<Interface>> otherInterfaces = new LinkedList<List<Interface>>(other.getInterfaces().values());
-            return this.getStates().equals(other.getStates())
-	                && this.getInitialState().equals(other.getInitialState())
-	                && this.getSuccessState().equals(other.getSuccessState())
-	                && this.getErrorState().equals(other.getErrorState())
-	                && this.getTransitionSystem().equals(other.getTransitionSystem())
-	                && thisInterfaces.equals(otherInterfaces);
+            return areEqualFDTMC(other);
 	    }
 	    return false;
 	}
