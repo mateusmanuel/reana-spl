@@ -45,6 +45,24 @@ public class Transition {
 		this.target = target;
 	}
 
+	private boolean notNullTransition(Object obj) {
+		return obj != null && obj instanceof Transition;
+	}
+
+	private boolean areEqualSources(State source) {
+		return this.getSource().equals(source);
+	}
+
+	private boolean areEqualTargets(State target) {
+		return this.getTarget().equals(target);
+	}
+
+	public boolean areEqualTransitions(State source, State target, String probability) {
+		return areEqualSources(source)
+				&& areEqualTargets(target)
+				&& areEqualProbabilities(probability);
+	}
+
     /**
      * Two transitions are equal if they have equal source and target states.
      * Moreover, their transition probabilities must be equal numbers or
@@ -52,12 +70,11 @@ public class Transition {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof Transition) {
+        if (notNullTransition(obj)) {
             Transition other = (Transition) obj;
-            return this.getSource().equals(other.getSource())
-                    && getTarget().equals(other.getTarget())
-                    && areEqualProbabilities(this.getProbability(), other.getProbability());
+            return areEqualTransitions(other.getSource(), other.getTarget(), other.getProbability());
         }
+
         return false;
     }
 
@@ -73,7 +90,9 @@ public class Transition {
      * @param p2
      * @return
      */
-    private boolean areEqualProbabilities(String p1, String p2) {
+    private boolean areEqualProbabilities(String p2) {
+    	String p1 = this.getProbability();
+
         double prob1 = 0;
         double prob2 = 0;
         boolean isVariable = false;
