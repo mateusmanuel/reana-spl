@@ -25,7 +25,17 @@ import java.util.Set;
  */
 public class ParamWrapper implements ParametricModelChecker {
     private static final Logger LOGGER = Logger.getLogger(ParamWrapper.class.getName());
-
+    private static final String OPEN_BRACKET = "{";
+    private static final String CLOSE_BRACKET = "}";
+    private static final String COMMA = ",";
+    private static final String PIPE_SIGN = "|";
+    private static final String SLASH_SIGN = "/";
+    private static final String SPACE = " ";
+    private static final String OUTPUT_EXTENSION = ".out";
+    private static final String RESULT_FLAG = "--result-file ";
+    private static final String EXPORT_FLAG = "-exportresults ";
+    private static final String PARAM_FLAG = " -param ";
+    
 	private String paramPath;
 	private IModelCollector modelCollector;
 	private boolean usePrism = false;
@@ -167,33 +177,33 @@ public class ParamWrapper implements ParametricModelChecker {
 	private String invokeParametricModelChecker(String modelPath,
 												String propertyPath,
 												String resultsPath) throws IOException {
-		String commandLine = getParamPath() + " "
-							 + modelPath + " "
-							 + propertyPath + " "
-							 + "--result-file " + resultsPath;
-		return invokeAndGetResult(commandLine, resultsPath + ".out");
+		String commandLine = getParamPath() + SPACE
+							 + modelPath + SPACE
+							 + propertyPath + SPACE
+							 + RESULT_FLAG + resultsPath;
+		return invokeAndGetResult(commandLine, resultsPath + OUTPUT_EXTENSION);
 	}
 
 	public String initializeCommandLine(String modelPath, String propertyPath, String resultsPath) {
-		return getParamPath() + " "
-                + modelPath + " "
-                + propertyPath + " "
-                + "-exportresults " + resultsPath;
+		return getParamPath() + SPACE
+                + modelPath + SPACE
+                + propertyPath + SPACE
+                + EXPORT_FLAG + resultsPath;
 	}
 
 	public String addParametersToCommandLine(String commandLine, Set<String> parameters) {
-		return commandLine + " -param " + String.join(",", parameters);
+		return commandLine + PARAM_FLAG + String.join(COMMA, parameters);
 	}
 
 	public String generateExpressionFromRawResult(String rawResult) {
-        int openBracket = rawResult.indexOf("{");
-        int closeBracket = rawResult.indexOf("}");
+        int openBracket = rawResult.indexOf(OPEN_BRACKET);
+        int closeBracket = rawResult.indexOf(CLOSE_BRACKET);
 
 		return rawResult.substring(openBracket + 1, closeBracket);
 	}
 
 	public String parseExpression(String expression) {
-		return expression.trim().replace('|', '/');
+		return expression.trim().replace(PIPE_SIGN, SLASH_SIGN);
 	}
 
     private String invokeParametricPRISM(ParamModel model, String modelPath, String propertyPath, String resultsPath) throws IOException {
