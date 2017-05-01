@@ -29,6 +29,14 @@ public class State {
 	public String getLabel() {
 		return this.label;
 	}
+	
+	private boolean notNullState (Object obj){
+		return obj != null && obj instanceof State;
+	}
+	
+	private boolean equalIndexes(int index){
+		return this.getIndex() == index;
+	}
 
     /**
      * A state is equal to another one if they have equal indices.
@@ -36,9 +44,9 @@ public class State {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof State) {
+        if (notNullState(obj)) {
             State other = (State) obj;
-            return this.getIndex() == other.getIndex();
+            return equalIndexes(other.getIndex());
         }
         return false;
     }
