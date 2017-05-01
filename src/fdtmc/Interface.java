@@ -70,18 +70,27 @@ public class Interface {
     	this.abstractedId = abstractedId;
     }
 
+    private boolean notNullInterface(Object obj) {
+    	return obj != null && obj instanceof Interface;
+    }
+
+    private boolean areEqualInterfaces(Interface other) {
+    	return this.getInitial().equals(other.getInitial())
+                && this.getSuccess().equals(other.getSuccess())
+                && this.getError().equals(other.getError())
+                && this.getSuccessTransition().equals(other.getSuccessTransition())
+                && this.getErrorTransition().equals(other.getErrorTransition());
+    }
+
     /**
      * Interfaces are compared for equality disregarding the abstracted id.
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof Interface) {
+        if (notNullInterface(obj)) {
             Interface other = (Interface) obj;
-            return this.getInitial().equals(other.getInitial())
-                    && this.getSuccess().equals(other.getSuccess())
-                    && this.getError().equals(other.getError())
-                    && this.getSuccessTransition().equals(other.getSuccessTransition())
-                    && this.getErrorTransition().equals(other.getErrorTransition());
+
+            return areEqualInterfaces(other);
         }
         return false;
     }
