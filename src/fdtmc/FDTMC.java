@@ -14,19 +14,19 @@ import java.util.Set;
 public class FDTMC {
 
     public static final String INITIAL_LABEL = "initial";
-    public static final String SUCCESS_LABEL = "success";
-    public static final String ERROR_LABEL = "error";
-    public static final String EMPTY_STRING = "";
-    public static final String ONE = "1";
-    public static final String HYPHEN = "-";
-    public static final String SPACE = " ";
-    public static final String OPEN_PARENTHESIS = "(";
-    public static final String CLOSE_PARENTHESIS = ")";
-    public static final String EQUAL_SIGN = "=";
-    public static final String TRIPLE_HYPHEN = "---";
-    public static final String GREATER_SIGN = ">";
-    public static final String SLASH_SIGN = "/";
-    public static final String NEW_LINE = "/n";
+    private static final String SUCCESS_LABEL = "success";
+    private static final String ERROR_LABEL = "error";
+    private static final String EMPTY_STRING = "";
+    private static final String ONE = "1";
+    private static final String HYPHEN = "-";
+    private static final String SPACE = " ";
+    private static final String OPEN_PARENTHESIS = "(";
+    private static final String CLOSE_PARENTHESIS = ")";
+    private static final String EQUAL_SIGN = "=";
+    private static final String TRIPLE_HYPHEN = "---";
+    private static final String GREATER_SIGN = ">";
+    private static final String SLASH_SIGN = "/";
+    private static final String NEW_LINE = "\n";
 
 	private Set<State> states;
     private State initialState;
@@ -59,11 +59,17 @@ public class FDTMC {
         return this.initialState;
     }
 
-    private void setInitialState(State initialState) {
+    public void setInitialState(State initialState) {
+    	this.initialState = initialState;
+    }
+
+    private void setAndAddLabelToInitialState(State initialState) {
         if (this.initialState != null) {
             this.initialState.setLabel(null);
         }
-        this.initialState = initialState;
+
+        this.setInitialState(initialState);
+
         initialState.setLabel(INITIAL_LABEL);
     }
     
@@ -116,6 +122,22 @@ public class FDTMC {
     public void setInterfaces(Map<String, List<Interface>> interfaces) {
     	this.interfaces = interfaces;
     }
+    
+	public void addInTransitionSystem(State state, List<Transition> list) {
+		this.getTransitionSystem().put(state, list);
+	}
+	
+	public List<Transition> getValueFromTransitionSystem(State state) {
+		return this.getTransitionSystem().get(state);
+	}
+	
+	public void addInInterfaces(String entry, List<Interface> interfaces) {
+		this.getInterfaces().put(entry, interfaces);
+	}
+	
+	public List<Interface> getValueFromInterfaces(String entry) {
+		return this.getInterfaces().get(entry);
+	}
 
 	public State createState() {
 		State temp = new State();
@@ -137,7 +159,7 @@ public class FDTMC {
 
     public State createInitialState() {
         State initial = createState();
-        setInitialState(initial);
+        setAndAddLabelToInitialState(initial);
         return initial;
     }
     public State createSuccessState() {
@@ -157,14 +179,14 @@ public class FDTMC {
 	        return null;
 	    }
 
-	    List<Transition> l = this.getTransitionSystem().get(source);
+	    List<Transition> l = this.getValueFromTransitionSystem(source);
 		if (l == null) {
 			l = new LinkedList<Transition>();
 		}
 
 		Transition newTransition = new Transition(source, target, action, reliability);
 		
-		this.getTransitionSystem().put(source, l);
+		this.addInTransitionSystem(source, l);
 		return l.add(newTransition) ? newTransition : null;
 	}
 
@@ -197,7 +219,7 @@ public class FDTMC {
 		String idInterface = id;	
 		List<Interface> interfaceOccurrences = null;
 		if (this.getInterfaces().containsKey(idInterface)) {
-	        interfaceOccurrences = this.getInterfaces().get(idInterface);
+	        interfaceOccurrences = this.getValueFromInterfaces(idInterface);
 	    } else {
 	        interfaceOccurrences = new LinkedList<Interface>();
 	        this.getInterfaces().put(idInterface, interfaceOccurrences);
@@ -252,7 +274,7 @@ public class FDTMC {
 	public String buildTransitionMessageForState(State state) {
 		
 		String message = new String();
-		List<Transition> transitionList = this.getTransitionSystem().get(state);
+		List<Transition> transitionList = this.getValueFromTransitionSystem(state);
 		
 		if (transitionList != null) {
 			Iterator <Transition> itTransitions = transitionList.iterator();
@@ -387,7 +409,7 @@ public class FDTMC {
     private Map<State, State> copyForInlining(FDTMC destination) {
         destination.setVariableName(this.getVariableName());
         Map<State, State> statesMapping = destination.inlineStates(this);
-        destination.setInitialState(statesMapping.get(this.getInitialState()));
+        destination.setAndAddLabelToInitialState(statesMapping.get(this.getInitialState()));
         destination.setSuccessState(statesMapping.get(this.getSuccessState()));
         destination.setErrorState(statesMapping.get(this.getErrorState()));
 
@@ -404,7 +426,7 @@ public class FDTMC {
         copied.setVariableName(this.getVariableName());
 
         Map<State, State> statesMapping = copied.inlineStates(this);
-        copied.setInitialState(statesMapping.get(this.getInitialState()));
+        copied.setAndAddLabelToInitialState(statesMapping.get(this.getInitialState()));
         copied.setSuccessState(statesMapping.get(this.getSuccessState()));
         copied.setErrorState(statesMapping.get(this.getErrorState()));
 
