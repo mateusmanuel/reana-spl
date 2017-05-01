@@ -16,6 +16,17 @@ public class FDTMC {
     public static final String INITIAL_LABEL = "initial";
     public static final String SUCCESS_LABEL = "success";
     public static final String ERROR_LABEL = "error";
+    public static final String EMPTY_STRING = "";
+    public static final String ONE = "1";
+    public static final String HYPHEN = "-";
+    public static final String SPACE = " ";
+    public static final String OPEN_PARENTHESIS = "(";
+    public static final String CLOSE_PARENTHESIS = ")";
+    public static final String EQUAL_SIGN = "=";
+    public static final String TRIPLE_HYPHEN = "---";
+    public static final String GREATER_SIGN = ">";
+    public static final String SLASH_SIGN = "/";
+    public static final String NEW_LINE = "/n";
 
 	private Set<State> states;
     private State initialState;
@@ -170,8 +181,8 @@ public class FDTMC {
 	 * @param error Error state of the interface.
 	 */
 	public Interface createInterface(String id, State initial, State success, State error) {
-	    Transition successTransition = createTransition(initial, success, "", id);
-	    Transition errorTransition = createTransition(initial, error, "", "1 - " + id);
+	    Transition successTransition = createTransition(initial, success, EMPTY_STRING, id);
+	    Transition errorTransition = createTransition(initial, error, EMPTY_STRING, ONE + HYPHEN + SPACE + id);
 	    Interface newInterface = new Interface(id,
 	                                           initial,
 	                                           success,
@@ -255,13 +266,13 @@ public class FDTMC {
 	}
 	
 	public String createMessage(Transition transition, State state) {
-		return state.getVariableName() + "=" + state.getIndex() + 
-				((state.getLabel() != null) ? "(" + state.getLabel() + ")" : "") +
-				" --- " + transition.getActionName() + 
-				" / " + transition.getProbability() +
-				" ---> " + transition.getTarget().getVariableName() + 
-				"=" + transition.getTarget().getIndex() + 
-				((transition.getTarget().getLabel() != null) ? "(" + transition.getTarget().getLabel() + ")" : "") + "\n";
+		return state.getVariableName() + EQUAL_SIGN + state.getIndex() + 
+				((state.getLabel() != null) ? OPEN_PARENTHESIS + state.getLabel() + CLOSE_PARENTHESIS : EMPTY_STRING) +
+				SPACE + TRIPLE_HYPHEN + SPACE + transition.getActionName() + 
+				SPACE + SLASH_SIGN + SPACE + transition.getProbability() +
+				SPACE + TRIPLE_HYPHEN + GREATER_SIGN + SPACE + transition.getTarget().getVariableName() + 
+				EQUAL_SIGN + transition.getTarget().getIndex() + 
+				((transition.getTarget().getLabel() != null) ? OPEN_PARENTHESIS + transition.getTarget().getLabel() + CLOSE_PARENTHESIS : EMPTY_STRING) + NEW_LINE;
 	}
 
 	/**
@@ -338,13 +349,13 @@ public class FDTMC {
         // Enter the original chain in case of presence
         decorated.createTransition(newInitial,
                                    oldInitial,
-                                   "",
+                                   EMPTY_STRING,
                                    presenceVariable);
         // Short-circuit in case of absence
         decorated.createTransition(newInitial,
                                    decorated.getSuccessState(),
-                                   "",
-                                   "1-"+presenceVariable);
+                                   EMPTY_STRING,
+                                   ONE + HYPHEN + presenceVariable);
         return decorated;
     }
 
@@ -483,17 +494,17 @@ public class FDTMC {
 
         this.createTransition(statesMapping.get(initialInlined),
                               fragmentStatesMapping.get(initialFragment),
-                              "",
-                              "1");
+                              EMPTY_STRING,
+                              ONE);
         this.createTransition(fragmentStatesMapping.get(successFragment),
                               statesMapping.get(successInlined),
-                              "",
-                              "1");
+                              EMPTY_STRING,
+                              ONE);
         if (errorFragment != null) {
             this.createTransition(fragmentStatesMapping.get(errorFragment),
                                   statesMapping.get(errorInlined),
-                                  "",
-                                  "1");
+                                  EMPTY_STRING,
+                                  ONE);
         }
     }
 
